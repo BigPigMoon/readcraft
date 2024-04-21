@@ -10,10 +10,8 @@ import {
   Post,
   Put,
   Query,
-  Req,
-  UsePipes,
 } from '@nestjs/common';
-import { ApiBearerAuth, ApiBody, ApiOperation, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { GetCurrentUser } from 'src/common/decorators';
 import { LessonService } from './lesson.service';
 import { CreateLessonDto, GetLessonDto, UpdateLessonDto } from './dto';

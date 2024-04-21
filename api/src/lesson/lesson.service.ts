@@ -4,7 +4,6 @@ import {
   Injectable,
   Logger,
   NotFoundException,
-  NotImplementedException,
 } from '@nestjs/common';
 import { CreateLessonDto, GetLessonDto, UpdateLessonDto } from './dto';
 import { PrismaService } from 'src/prisma/prisma.service';
