@@ -3,16 +3,138 @@ generator client {
 }
 
 datasource db {
-  provider = "sqlite"
-  url      = "file:./dev.db"
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
 }
 
-model users {
-  id             Int      @id @default(autoincrement())
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @updatedAt
-  email          String   @unique
+model User {
+  id             Int          @id @default(autoincrement())
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+  email          String       @unique
+  nickname       String       @unique
   hashedPassword String
   hashedRt       String?
-  nickname       String   @unique
+  courseUsers    CourseUser[]
+  bookUsers      BookUser[]
+  folderUsers    FolderUser[]
+}
+
+model Course {
+  id          Int          @id @default(autoincrement())
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+  title       String
+  inviteLink  String?
+  active      Boolean      @default(true)
+  language    Language
+  courseUsers CourseUser[]
+  lessons     Lesson[]
+}
+
+model CourseUser {
+  id       Int     @id @default(autoincrement())
+  owned    Boolean
+  course   Course  @relation(fields: [courseId], references: [id])
+  courseId Int
+  user     User    @relation(fields: [userId], references: [id])
+  userId   Int
+}
+
+model Lesson {
+  id          Int      @id @default(autoincrement())
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  title       String
+  coverPath   String?
+  subject     String?
+  contentPath String
+  active      Boolean  @default(true)
+  course      Course   @relation(fields: [courseId], references: [id])
+  courseId    Int
+}
+
+model Book {
+  id        Int        @id @default(autoincrement())
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+  title     String
+  language  Language
+  filename  String
+  coverPath String?
+  subject   String
+  author    String
+  active    Boolean    @default(true)
+  progress  Int        @default(0)
+  bookUsers BookUser[]
+}
+
+model BookUser {
+  id     Int  @id @default(autoincrement())
+  chunk  Int  @default(0)
+  book   Book @relation(fields: [bookId], references: [id])
+  bookId Int
+  user   User @relation(fields: [userId], references: [id])
+  userId Int
+}
+
+model Folder {
+  id          Int          @id @default(autoincrement())
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+  title       String
+  inviteCode  String
+  active      Boolean      @default(true)
+  children    Folder[]     @relation("FolderToParent")
+  parent      Folder?      @relation("FolderToParent", fields: [parentId], references: [id])
+  parentId    Int
+  cards       Card[]
+  folderUsers FolderUser[]
+}
+
+model Card {
+  id          Int      @id @default(autoincrement())
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  word        String
+  translation String
+  active      Boolean  @default(true)
+  folder      Folder   @relation(fields: [folderId], references: [id])
+  folderId    Int
+}
+
+model FolderUser {
+  id       Int    @id @default(autoincrement())
+  folder   Folder @relation(fields: [folderId], references: [id])
+  folderId Int
+  user     User   @relation(fields: [userId], references: [id])
+  userId   Int
+}
+
+enum Language {
+  // BG
+  // CS
+  // DA
+  DE
+  // EL
+  EN
+  // ES
+  // ET
+  // FI
+  FR
+  // HU
+  // IT
+  // JA
+  // LT
+  // LV
+  // MT
+  // NL
+  // PL
+  // PT
+  // RO
+  RU
+  // SK
+  // SL
+  // SV
+  ZH
 }

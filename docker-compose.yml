@@ -1,0 +1,48 @@
+version: "3.3"
+services:
+  rc_db:
+    image: postgres
+    environment:
+      POSTGRES_DB: "rc_db"
+      POSTGRES_USER: "bpm"
+      POSTGRES_PASSWORD: "root"
+    ports:
+      - "5432:5432"
+    volumes:
+      - db:/var/lib/postgresql/data
+    networks:
+      - net
+
+  rc_test_db:
+    image: postgres
+    environment:
+      POSTGRES_DB: "test_db"
+      POSTGRES_USER: "bpm"
+      POSTGRES_PASSWORD: "root"
+    ports:
+      - "5435:5432"
+    volumes:
+      - db_test:/var/lib/postgresql/data
+    networks:
+      - net
+
+  cache:
+    image: "redis:latest"
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    restart: always
+    networks:
+      - net
+
+volumes:
+  redis_data:
+  db:
+    driver: local
+  db_test:
+    driver: local
+
+networks:
+  net:
+    driver: bridge

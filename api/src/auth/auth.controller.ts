@@ -14,13 +14,12 @@ import { GetCurrentUser } from '../common/decorators';
 import { Tokens } from './types';
 import { SingInDto, SingUpDto } from './dto';
 
-@ApiBearerAuth()
-@ApiTags('auth')
+@ApiTags('Auth')
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
-  @ApiOperation({ summary: 'Sign up in local way' })
+  @ApiOperation({ summary: 'Регистрирует пользователя' })
   @Public()
   @Post('local/signup')
   @HttpCode(HttpStatus.CREATED)
@@ -28,7 +27,7 @@ export class AuthController {
     return this.authService.signUpLocal(dto);
   }
 
-  @ApiOperation({ summary: 'Sign in in local way' })
+  @ApiOperation({ summary: 'Авторизует пользователя' })
   @Public()
   @Post('local/signin')
   @HttpCode(HttpStatus.OK)
@@ -36,8 +35,9 @@ export class AuthController {
     return this.authService.signInLocal(dto);
   }
 
+  @ApiBearerAuth()
   @ApiOperation({
-    summary: 'logout from user and remove refresh token from database',
+    summary: 'Выход пользователя из аккаунта',
   })
   @Post('logout')
   @HttpCode(HttpStatus.OK)
@@ -45,7 +45,8 @@ export class AuthController {
     return this.authService.logout(userId);
   }
 
-  @ApiOperation({ summary: 'update refresh token in database' })
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Обновляет токены авторизации' })
   @HttpCode(HttpStatus.OK)
   @Public()
   @UseGuards(RtGuard)

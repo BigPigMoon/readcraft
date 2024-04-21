@@ -1,16 +1,17 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import * as fs from 'fs';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
   app.setGlobalPrefix('api');
   const config = new DocumentBuilder()
+    .addSecurity('bearer', { type: 'http', scheme: 'bearer' })
     .setTitle('ReadCraftAcademyAPI')
     .setDescription('This is a read craft academy api documentation')
     .setVersion('0.1')
-    .addTag('main')
     .build();
 
   const document = SwaggerModule.createDocument(app, config);
@@ -21,7 +22,25 @@ async function bootstrap() {
     origin: true,
   });
 
+  createDirectory(process.env.LESSON_DIR);
+
   await app.listen(3000);
+}
+
+function createDirectory(directory: string) {
+  fs.access(directory, fs.constants.F_OK, (err) => {
+    if (err) {
+      fs.mkdir(directory, (err) => {
+        if (err) {
+          console.error('Error creating directory:', err);
+        } else {
+          console.log('Directory created successfully');
+        }
+      });
+    } else {
+      console.log('Directory already exists');
+    }
+  });
 }
 
 bootstrap();
