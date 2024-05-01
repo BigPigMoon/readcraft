@@ -4,6 +4,8 @@ import { Language } from '@prisma/client';
 export class GetBookDto {
   @ApiProperty({ description: 'Идентификатор книги', example: '1' })
   id: number;
+
+  // TODO: не знаю зачем, но вроде как эти поля будут нужны на вебе
   //   createdAt: Date;
   //   updatedAt: Date;
 
