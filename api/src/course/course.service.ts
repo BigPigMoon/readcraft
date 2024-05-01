@@ -96,8 +96,8 @@ export class CourseService {
     }
 
     const updatedCourse = await this.prisma.course.update({
-      data: { title: dto.title, language: dto.language },
       where: { id: dto.id },
+      data: { title: dto.title, language: dto.language },
     });
 
     return await this.getCourseDto(userId, updatedCourse);

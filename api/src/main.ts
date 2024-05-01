@@ -23,6 +23,7 @@ async function bootstrap() {
   });
 
   createDirectory(process.env.LESSON_DIR);
+  createDirectory(process.env.BOOK_DIR);
 
   await app.listen(3000);
 }
@@ -34,11 +35,11 @@ function createDirectory(directory: string) {
         if (err) {
           console.error('Error creating directory:', err);
         } else {
-          console.log('Directory created successfully');
+          console.log(`Directory ${directory} created successfully`);
         }
       });
     } else {
-      console.log('Directory already exists');
+      console.log(`Directory ${directory} already exists`);
     }
   });
 }

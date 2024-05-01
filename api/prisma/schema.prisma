@@ -62,8 +62,8 @@ model Book {
   language  Language
   filename  String
   coverPath String?
-  subject   String
-  author    String
+  subject   String?
+  author    String?
   active    Boolean    @default(true)
   progress  Int        @default(0)
   bookUsers BookUser[]
