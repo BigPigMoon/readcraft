@@ -25,7 +25,7 @@ model Course {
   createdAt   DateTime     @default(now())
   updatedAt   DateTime     @updatedAt
   title       String
-  inviteLink  String?
+  inviteLink  String?      @unique
   active      Boolean      @default(true)
   language    Language
   courseUsers CourseUser[]
@@ -83,11 +83,11 @@ model Folder {
   createdAt   DateTime     @default(now())
   updatedAt   DateTime     @updatedAt
   title       String
-  inviteCode  String
+  inviteCode  String       @unique
   active      Boolean      @default(true)
   children    Folder[]     @relation("FolderToParent")
   parent      Folder?      @relation("FolderToParent", fields: [parentId], references: [id])
-  parentId    Int
+  parentId    Int?
   cards       Card[]
   folderUsers FolderUser[]
 }
@@ -104,10 +104,11 @@ model Card {
 }
 
 model FolderUser {
-  id       Int    @id @default(autoincrement())
-  folder   Folder @relation(fields: [folderId], references: [id])
+  id       Int     @id @default(autoincrement())
+  owned    Boolean
+  folder   Folder  @relation(fields: [folderId], references: [id])
   folderId Int
-  user     User   @relation(fields: [userId], references: [id])
+  user     User    @relation(fields: [userId], references: [id])
   userId   Int
 }
 
