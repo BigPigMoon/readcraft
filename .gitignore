@@ -36,7 +36,6 @@ lerna-debug.log*
 
 dev.db*
 mirgations
-lessons
-books
+uploads
 audio
 __pycache__
