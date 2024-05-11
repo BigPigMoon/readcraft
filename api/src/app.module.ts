@@ -10,6 +10,7 @@ import { FolderModule } from './folder/folder.module';
 import { LanguageModule } from './language/language.module';
 import { TranslatorModule } from './translator/translator.module';
 import { LessonModule } from './lesson/lesson.module';
+import { ImageModule } from './image/image.module';
 
 @Module({
   imports: [
@@ -22,6 +23,7 @@ import { LessonModule } from './lesson/lesson.module';
     LanguageModule,
     TranslatorModule,
     LessonModule,
+    ImageModule,
   ],
   providers: [{ provide: APP_GUARD, useClass: AtGuard }],
 })

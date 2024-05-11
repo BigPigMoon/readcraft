@@ -24,6 +24,7 @@ async function bootstrap() {
 
   createDirectory(process.env.LESSON_DIR);
   createDirectory(process.env.BOOK_DIR);
+  createDirectory(process.env.IMAGE_DIR);
 
   await app.listen(3000);
 }
@@ -31,7 +32,7 @@ async function bootstrap() {
 function createDirectory(directory: string) {
   fs.access(directory, fs.constants.F_OK, (err) => {
     if (err) {
-      fs.mkdir(directory, (err) => {
+      fs.mkdir(directory, { recursive: true }, (err) => {
         if (err) {
           console.error('Error creating directory:', err);
         } else {
