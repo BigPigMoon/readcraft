@@ -10,7 +10,7 @@
 	import type { Item, Card, Folder } from '$lib/types/card';
 	import rcApi from '$lib/http/rc';
 
-	let items: Item[] = [];
+	let items: (Folder | Card)[] = [];
 	let selectedFolderId: number;
 	let path: Folder[] = [];
 
@@ -25,9 +25,10 @@
 	onMount(async () => {
 		let folderId: number;
 
+		// FIXME:
 		let storedFolderId = localStorage.getItem('selectedFolder');
 		if (!storedFolderId) {
-			folderId = (await rcApi.get<number>('/api/group/root')).data;
+			folderId = (await rcApi.get<Folder>('/api/folder/root')).data.id;
 		} else {
 			folderId = parseInt(storedFolderId);
 		}
@@ -36,45 +37,33 @@
 	});
 
 	const createCard = async () => {
-		const createWordRes = await rcApi.post('/api/card/create', {
+		const createWordRes = await rcApi.post('/api/card', {
 			word: newCardWord,
 			translation: newCardTranslation,
-			group_id: selectedFolderId
+			folderId: selectedFolderId
 		});
 
-		let newCard: Card = {
-			id: createWordRes.data,
-			group_id: selectedFolderId,
-			word: newCardWord,
-			translation: newCardTranslation
-		};
+		let newCard: Card = createWordRes.data;
 
 		newCardTranslation = '';
 		newCardWord = '';
 
-		items = [...items, { Card: newCard }];
-		items = items.sort(sortItems);
+		items = [...items, newCard];
 	};
 
 	const createFolder = async () => {
 		if (newFolderEmpty) return;
 
-		const createFolderRes = await rcApi.post('/api/group/create', {
+		const createFolderRes = await rcApi.post('/api/folder', {
 			title: newFolderTitle,
-			group_id: selectedFolderId
+			folderId: selectedFolderId
 		});
 
-		let newGroup: Folder = {
-			id: createFolderRes.data,
-			title: newFolderTitle,
-			group_id: selectedFolderId,
-			invite_code: ''
-		};
+		let newFolder: Folder = createFolderRes.data;
 
 		newFolderTitle = '';
 
-		items = [...items, { Group: newGroup }];
-		items = items.sort(sortItems);
+		items = [newFolder, ...items];
 
 		isNewFolder = false;
 	};
@@ -91,35 +80,30 @@
 	const selectFolder = async (folderId: number) => {
 		selectedFolderId = folderId;
 
-		const getItemsRes = (await rcApi.get<Item[]>(`/api/group/items/${selectedFolderId}`)).data.sort(
-			sortItems
-		);
-
-		items = [...getItemsRes];
-
-		path = (await rcApi.get<Folder[]>(`/api/group/path/${selectedFolderId}`)).data.reverse();
-	};
-
-	const sortItems = (a: Item, b: Item) => {
-		// Если у обоих элементов есть тип 'Group', то они равны между собой
-		if (a.Group && b.Group) {
-			return 0;
-		} else if (a.Group) {
-			return -1; // Элемент 'a' идет первым, так как у него тип 'Group'
-		} else if (b.Group) {
-			return 1; // Элемент 'b' идет первым, так как у него тип 'Group'
+		let itemsRes;
+		try {
+			itemsRes = await rcApi.get<Item>(`/api/folder/items/${selectedFolderId}`);
+		} catch (err) {
+			if (err.response.status === 404) {
+				console.error('selected folder not found');
+				selectedFolderId = (await rcApi.get<Folder>('/api/folder/root')).data.id;
+				itemsRes = await rcApi.get<Item>(`/api/folder/items/${selectedFolderId}`);
+				localStorage.setItem('selectedFolder', selectedFolderId.toString());
+			}
 		}
 
-		// Если у обоих элементов нет типа 'Group', сравниваем по типу 'Card'
-		if (a.Card && b.Card) {
-			return 0;
-		} else if (a.Card) {
-			return -1; // Элемент 'a' идет первым, так как у него тип 'Card'
-		} else if (b.Card) {
-			return 1; // Элемент 'b' идет первым, так как у него тип 'Card'
-		}
+		items = [];
+		if (itemsRes) {
+			const getItemsRes = itemsRes.data;
+			if (getItemsRes.folders) {
+				items = [...getItemsRes.folders, ...items];
+			}
+			if (getItemsRes.cards) {
+				items = [...items, ...getItemsRes.cards];
+			}
 
-		return 0;
+			path = (await rcApi.get<Folder[]>(`/api/folder/path/${selectedFolderId}`)).data;
+		}
 	};
 
 	const onRemoveItem = (event: any) => {
@@ -131,17 +115,11 @@
 	const removeItem = (id: number, type: string) => {
 		if (type === 'card') {
 			items = items.filter((item) => {
-				if (item.Card) {
-					return item.Card.id !== id;
-				}
-				return true; // Если элемент не является ни Card, ни Group, оставляем его в списке
+				return !(isCard(item) && item.id === id);
 			});
 		} else if (type === 'folder') {
 			items = items.filter((item) => {
-				if (item.Group) {
-					return item.Group.id !== id;
-				}
-				return true; // Если элемент не является ни Card, ни Group, оставляем его в списке
+				return !(isFolder(item) && item.id === id);
 			});
 		}
 	};
@@ -157,21 +135,15 @@
 
 		const id = item.id;
 		if (item.type === 'card') {
-			await rcApi.delete(`/api/card/delete/${id}`);
+			await rcApi.delete(`/api/card/${id}`);
 
 			items = items.filter((item) => {
-				if (item.Card) {
-					return item.Card.id !== id;
-				}
-				return true; // Если элемент не является ни Card, ни Group, оставляем его в списке
+				return !(isCard(item) && item.id === id);
 			});
 		} else if (item.type === 'folder') {
-			await rcApi.delete(`/api/group/delete/${id}`);
+			await rcApi.delete(`/api/folder/${id}`);
 			items = items.filter((item) => {
-				if (item.Group) {
-					return item.Group.id !== id;
-				}
-				return true; // Если элемент не является ни Card, ни Group, оставляем его в списке
+				return !(isFolder(item) && item.id === id);
 			});
 		}
 	};
@@ -188,20 +160,20 @@
 		const item = JSON.parse(data);
 
 		if (item.type === 'card') {
-			await rcApi.put('/api/card/update', {
+			await rcApi.put('/api/card', {
 				id: item.id,
 				word: item.word,
 				translation: item.translation,
-				group_id: id
+				folderId: id
 			});
 			removeItem(item.id, 'card');
 		} else if (item.type === 'folder') {
 			if (id === item.id) return;
 
-			await rcApi.put('/api/group/update', {
+			await rcApi.put('/api/folder', {
 				id: item.id,
 				title: item.title,
-				group_id: id
+				folderId: id
 			});
 
 			removeItem(item.id, 'folder');
@@ -211,7 +183,7 @@
 	const copyFolderCode = () => {
 		const input = document.createElement('input');
 		document.body.appendChild(input);
-		input.value = path.slice(-1)[0].invite_code;
+		input.value = path.slice(-1)[0].inviteCode;
 		input.select();
 		document.execCommand('copy');
 		document.body.removeChild(input);
@@ -222,13 +194,21 @@
 		if (inviteCodeEmpty) return;
 
 		rcApi
-			.post('/api/group/copy', {
-				invite_code: inviteCodeValue,
-				parent_id: selectedFolderId
+			.post('/api/folder/copy', {
+				inviteCode: inviteCodeValue,
+				parentId: selectedFolderId
 			})
 			.then((res) => {
 				location.reload();
 			});
+	};
+
+	const isCard = (item: any) => {
+		return 'word' in item && 'translation' in item;
+	};
+
+	const isFolder = (item: any) => {
+		return 'title' in item && 'inviteCode' in item;
 	};
 
 	$: newFolderEmpty = newFolderTitle.length === 0;
@@ -329,24 +309,16 @@
 				<div class="flex flex-wrap">
 					{#if items.length > 0}
 						{#each items as item}
-							{#if item.Card}
-								<WordCard
-									id={item.Card.id}
-									word={item.Card.word}
-									translation={item.Card.translation}
-								/>
+							{#if isCard(item)}
+								<WordCard id={item.id} word={item.word} translation={item.translation} />
 							{/if}
-							{#if item.Group}
+							{#if isFolder(item)}
 								<button
 									on:click={async () => {
-										await onFolderClick(item.Group?.id);
+										await onFolderClick(item.id);
 									}}
 								>
-									<FolderCard
-										on:removeItem={onRemoveItem}
-										id={item.Group.id}
-										title={item.Group.title}
-									/>
+									<FolderCard on:removeItem={onRemoveItem} id={item.id} title={item.title} />
 								</button>
 							{/if}
 						{/each}

@@ -7,5 +7,6 @@ import { CardModule } from 'src/card/card.module';
   controllers: [FolderController],
   providers: [FolderService],
   imports: [CardModule],
+  exports: [FolderService],
 })
 export class FolderModule {}

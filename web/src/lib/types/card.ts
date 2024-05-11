@@ -1,23 +1,23 @@
 export interface Item {
-  Card?: Card
-  Group?: Folder
+	cards?: Card[];
+	folders?: Folder[];
 }
 
 export interface Card {
-  id: number
-  word: string
-  translation: string
-  group_id: number
+	id: number;
+	word: string;
+	translation: string;
+	folderId: number;
 }
 
 export interface Folder {
-  id: number
-  title: string
-  invite_code: string
-  group_id: number
+	id: number;
+	title: string;
+	inviteCode: string;
+	parentId: number;
 }
 
 export interface TreeNode {
-  root: Folder,
-  children: TreeNode[],
+	root: Folder;
+	children: TreeNode[];
 }

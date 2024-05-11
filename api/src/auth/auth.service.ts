@@ -10,6 +10,7 @@ import { SingInDto, SingUpDto } from './dto';
 import { Tokens } from './types';
 import * as bcrypt from 'bcrypt';
 import { Prisma } from '@prisma/client';
+import { FolderService } from 'src/folder/folder.service';
 
 @Injectable()
 export class AuthService {
@@ -18,6 +19,7 @@ export class AuthService {
   constructor(
     private prisma: PrismaService,
     private jwtService: JwtService,
+    private folderService: FolderService,
   ) {}
 
   async signUpLocal(dto: SingUpDto): Promise<Tokens> {
@@ -45,6 +47,8 @@ export class AuthService {
         hashedPassword: hash,
       },
     });
+
+    this.folderService.create(newUser.id, { title: newUser.nickname });
 
     const tokens = await this.getTokens(newUser.id, newUser.email);
     await this.updateRtHash(newUser.id, tokens.refreshToken);

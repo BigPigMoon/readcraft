@@ -6,6 +6,7 @@
 	import { goto } from '$app/navigation';
 	import { page } from '$app/stores';
 	import ExitIcon from '$lib/Icons/ExitIcon.svelte';
+	import rcApi from '$lib/http/rc';
 
 	$: if (
 		browser &&
@@ -17,6 +18,7 @@
 	}
 
 	const handleLogoutButton = () => {
+		rcApi.post('/api/auth/logout')
 		clearTokens();
 		goto('/signin');
 	};
@@ -58,6 +60,7 @@
 							>
 								<li><a href="/">Карточки</a></li>
 								<li><a href="/library">Библиотека</a></li>
+								<li><a href="/translator">Переводчик</a></li>
 								<li><a href="/courses">Курсы</a></li>
 							</ul>
 						</div>
@@ -68,6 +71,7 @@
 						<ul class="menu menu-horizontal px-1 space-x-2">
 							<li><a href="/">Карточки</a></li>
 							<li><a href="/library">Библиотека</a></li>
+							<li><a href="/translator">Переводчик</a></li>
 							<li><a href="/courses">Курсы</a></li>
 						</ul>
 					</div>

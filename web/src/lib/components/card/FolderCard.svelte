@@ -29,21 +29,21 @@
 		const item = JSON.parse(data);
 
 		if (item.type === 'card') {
-			await rcApi.put('/api/card/update', {
+			await rcApi.put('/api/card', {
 				id: item.id,
 				word: item.word,
 				translation: item.translation,
-				group_id: id
+				folderId: id
 			});
 
 			dispatch('removeItem', { id: item.id, type: 'card' });
 		} else if (item.type === 'folder') {
 			if (id === item.id) return;
 
-			await rcApi.put('/api/group/update', {
+			await rcApi.put('/api/folder', {
 				id: item.id,
 				title: item.title,
-				group_id: id
+				folderId: id
 			});
 
 			dispatch('removeItem', { id: item.id, type: 'folder' });
