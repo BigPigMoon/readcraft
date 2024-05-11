@@ -45,6 +45,17 @@ services:
       - "5001:5001"
     networks:
       - net
+  
+  api:
+    image: rc_api
+    build:
+      context: ./api
+    ports:
+      - "3000:3000"
+    networks:
+      - net
+    env_file:
+      - ./api/.env
 
 volumes:
   redis_data:
