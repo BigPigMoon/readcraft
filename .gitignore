@@ -38,3 +38,5 @@ dev.db*
 mirgations
 lessons
 books
+audio
+__pycache__

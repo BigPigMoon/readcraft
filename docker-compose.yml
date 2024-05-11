@@ -36,6 +36,16 @@ services:
     networks:
       - net
 
+  translator:
+    image: translator
+    build:
+      context: ./translator
+    ports:
+      - "5000:5000"
+      - "5001:5001"
+    networks:
+      - net
+
 volumes:
   redis_data:
   db:
