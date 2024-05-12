@@ -19,13 +19,13 @@
 	let prevPageCount = 0;
 
 	onMount(() => {
-		rcApi.get<Book>(`/api/book/get/${bookId}`).then((res) => {
+		rcApi.get<Book>(`/api/book/${bookId}`).then((res) => {
 			book = res.data;
 		});
 
-		rcApi.get<any[]>(`/api/book/chunk/${bookId}`).then((res) => {
-			chunk = setChunkText(res.data[0]);
-			chunkPage = res.data[1];
+		rcApi.get<any[]>(`/api/book/page/${bookId}`).then((res) => {
+			chunk = setChunkText(res.data.content);
+			chunkPage = res.data.chunk;
 
 			scrollElement = document.querySelector('#scrollElement');
 
@@ -40,9 +40,9 @@
 			rcApi.post(`/api/book/page/${bookId}?page=${chunkPage + 1}`).then((res) => {
 				prevPageCount = pageNum;
 
-				rcApi.get(`/api/book/chunk/${bookId}`).then((res) => {
-					chunk = setChunkText(res.data[0]);
-					chunkPage = res.data[1];
+				rcApi.get(`/api/book/page/${bookId}`).then((res) => {
+					chunk = setChunkText(res.data.content);
+					chunkPage = res.data.chunk;
 					console.log(chunkPage);
 
 					pageNum = 0;
@@ -61,11 +61,11 @@
 	const prevPage = () => {
 		if (pageNum <= 0) {
 			rcApi.post(`/api/book/page/${bookId}?page=${chunkPage - 1}`).then((res) => {
-				rcApi.get(`/api/book/chunk/${bookId}`).then((res) => {
+				rcApi.get(`/api/book/page/${bookId}`).then((res) => {
 					console.log(res.data);
 
-					chunk = setChunkText(res.data[0]);
-					chunkPage = res.data[1];
+					chunk = setChunkText(res.data.content);
+					chunkPage = res.data.chunk;
 
 					pageNum = prevPageCount;
 					const transformValue = `translate3d(-${pageWidth * pageNum}px, 0px, 0px)`;

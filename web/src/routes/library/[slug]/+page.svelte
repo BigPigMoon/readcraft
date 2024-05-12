@@ -18,7 +18,7 @@
 		loading = true;
 
 		try {
-			const res = await rcApi.get<Book>(`/api/book/get/${bookId}`);
+			const res = await rcApi.get<Book>(`/api/book/${bookId}`);
 
 			book = res.data;
 		} catch (err) {
@@ -45,7 +45,7 @@
 	};
 
 	const deleteBook = () => {
-		rcApi.delete(`/api/book/delete/${bookId}`).then((res) => {
+		rcApi.delete(`/api/book/${bookId}`).then((res) => {
 			goto('/library');
 		});
 	};
@@ -57,7 +57,7 @@
 			<Loading />
 		{:else if book}
 			<figure>
-				<img class="h-full max-w-5xl" src="{RC_API}/api/image/{book.cover_path}" alt="witcher" />
+				<img class="h-full max-w-5xl" src="{RC_API}/api/image/download/{book.cover_path}" alt="witcher" />
 			</figure>
 			<div class="card-body w-fit">
 				<div class="h-full space-y-4 flex-col">

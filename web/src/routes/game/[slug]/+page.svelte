@@ -30,7 +30,7 @@
 	let isEnd = false;
 
 	onMount(async () => {
-		const getAllCards = await rcApi.get<Card[]>(`/api/card/all/${folderId}`);
+		const getAllCards = await rcApi.get<Card[]>(`/api/card/${folderId}`);
 		cards = getAllCards.data;
 		learning = getAllCards.data;
 

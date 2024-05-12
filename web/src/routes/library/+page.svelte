@@ -32,8 +32,8 @@
 		loading = true;
 
 		try {
-			languages = (await rcApi.get<string[]>('/api/languages/available')).data;
-			const res = await rcApi.get<Book[]>('/api/book/all');
+			languages = (await rcApi.get<string[]>('/api/language')).data;
+			const res = await rcApi.get<Book[]>('/api/book');
 
 			books = res.data;
 		} catch (err) {
@@ -54,7 +54,7 @@
 				rcApi.post('/api/book/upload', formData).then((bookRes) => {
 					if (bookRes.status === 200) {
 						rcApi
-							.post('/api/book/create', {
+							.post('/api/book', {
 								title: createTitle,
 								language: createLang,
 								filename: bookRes.data,
@@ -86,7 +86,7 @@
 					createSubject = val.description;
 					createLang = val.language;
 
-					createLang = createLang.charAt(0).toUpperCase() + createLang.slice(1);
+					createLang = createLang.toUpperCase();
 				});
 
 				book.coverUrl().then((url) => {
