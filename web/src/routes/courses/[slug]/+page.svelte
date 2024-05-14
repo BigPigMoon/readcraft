@@ -16,7 +16,7 @@
 	onMount(async () => {
 		loading = true;
 		try {
-			const res = await rcApi.get<Lesson[]>(`/api/lesson/all?course=${courseId}`);
+			const res = await rcApi.get<Lesson[]>(`/api/lesson?course=${courseId}`);
 
 			lessons = res.data;
 		} catch (err) {
@@ -37,20 +37,14 @@
 		formData.append('file', createLessonCover);
 
 		rcApi.post('/api/image/upload', formData).then(async (res) => {
-			const createLessonRes = await rcApi.post<number>('/api/lesson/create', {
+			const createLessonRes = await rcApi.post<Lesson>('/api/lesson', {
 				title: createLessonTitle,
 				subject: createLessonDesc.length === 0 ? null : createLessonDesc,
-				cover_path: res.data, // FIXME: cover doesn't set by user
-				course_id: Number.parseInt(courseId)
+				coverPath: res.data, // FIXME: cover doesn't set by user
+				courseId: Number.parseInt(courseId)
 			});
 
-			const newLesson: Lesson = {
-				id: createLessonRes.data,
-				title: createLessonTitle,
-				cover_path: `${RC_API}/lesson/images/${res.data}`,
-				subject: createLessonDesc,
-				course_id: Number.parseInt(courseId)
-			};
+			const newLesson: Lesson = createLessonRes.data;
 
 			lessons.push(newLesson);
 			lessons = lessons;

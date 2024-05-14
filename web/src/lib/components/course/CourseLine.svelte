@@ -18,19 +18,19 @@
 	let lessons: Lesson[] = [];
 
 	onMount(() => {
-		rcApi.get<Lesson[]>(`/api/lesson/all?course=${courseId}`).then((res) => {
+		rcApi.get<Lesson[]>(`/api/lesson?course=${courseId}`).then((res) => {
 			lessons = res.data;
 		});
 	});
 
 	const deleteCourse = () => {
-		rcApi.delete(`/api/course/delete/${courseId}`);
+		rcApi.delete(`/api/course/${courseId}`);
 
 		dispatch('remove', courseId);
 	};
 
 	const generateInviteCode = async () => {
-		const res = await rcApi.get<string>(`api/course/invite/generate/${courseId}`);
+		const res = await rcApi.get<string>(`api/course/gen/link/${courseId}`);
 
 		return res.data;
 	};
@@ -46,7 +46,7 @@
 	};
 
 	const unsubscribe = async () => {
-		await rcApi.post(`/api/course/unsubscribe/${courseId}`);
+		await rcApi.post(`/api/course/unsub/${courseId}`);
 		location.reload();
 	};
 </script>
@@ -81,7 +81,7 @@
 		{#each lessons as lesson}
 			<CourseLesson
 				id={lesson.id}
-				imageUrl={lesson.cover_path}
+				imageUrl={lesson.coverPath}
 				title={lesson.title}
 				description={lesson.subject}
 			/>

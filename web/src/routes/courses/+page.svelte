@@ -26,14 +26,14 @@
 		loading = true;
 
 		try {
-			courses = (await rcApi.get<Course[]>('/api/course/all?subscriptions=true')).data.sort(
-				(a, b) => (a.isOwner === b.isOwner ? 0 : a.isOwner ? -1 : 1)
+			courses = (await rcApi.get<Course[]>('/api/course?subs=true')).data.sort((a, b) =>
+				a.isOwner === b.isOwner ? 0 : a.isOwner ? -1 : 1
 			);
-			languages = (await rcApi.get<string[]>('/api/languages/available')).data;
+			languages = (await rcApi.get<string[]>('/api/language')).data;
 
 			const lastLessonId = getLastLesson();
 			if (lastLessonId) {
-				lastLesson = (await rcApi.get<Lesson>(`/api/lesson/get/${lastLessonId}`)).data;
+				lastLesson = (await rcApi.get<Lesson>(`/api/lesson/${lastLessonId}`)).data;
 			}
 		} catch (err) {
 		} finally {
@@ -44,17 +44,12 @@
 	const createCouresHandler = async () => {
 		if (createCourseError) return;
 
-		const new_course_id = await rcApi.post<number>('/api/course/create', {
+		const newCourseRes = await rcApi.post<Course>('/api/course', {
 			title: createCourseTitle,
 			language: createCourseLang
 		});
 
-		const newCourse: Course = {
-			isOwner: true,
-			language: createCourseLang,
-			title: createCourseTitle,
-			id: new_course_id.data
-		};
+		const newCourse: Course = newCourseRes.data;
 
 		courses = [...courses, newCourse].sort((a, b) =>
 			a.isOwner === b.isOwner ? 0 : a.isOwner ? -1 : 1

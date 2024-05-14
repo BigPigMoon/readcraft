@@ -8,7 +8,7 @@
 
 	onMount(async () => {
 		try {
-			await rcApi.post(`api/course/subscribe/${inviteCode}`);
+			await rcApi.post(`api/course/sub/${inviteCode}`);
 		} catch (err) {
 			console.error(err);
 		} finally {

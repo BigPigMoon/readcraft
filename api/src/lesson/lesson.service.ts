@@ -69,6 +69,7 @@ export class LessonService {
 
     const lessons = await this.prisma.lesson.findMany({
       where: { courseId: courseId, active: true },
+      orderBy: { createdAt: 'asc' },
     });
 
     return lessons.map((el) => this.getLessonDto(el));

@@ -14,7 +14,7 @@
 		<span class="font-bold ml-6">Урок на котором вы остановились</span>
 		<div class="card bg-neutral w-fit m-4">
 			<div class="card-body">
-				<p>{courses.filter((item) => item.id === lesson.course_id)[0].title}</p>
+				<p>{courses.filter((item) => item.id === lesson.courseId)[0].title}</p>
 				<p class="card-title">{lesson.title}</p>
 				<div class="card-actions justify-end">
 					<a class="btn btn-primary" href={`/lessons/reader/${lesson.id}`}>Продолжить</a>

@@ -20,10 +20,10 @@
 
 	onMount(async () => {
 		try {
-			lesson = (await rcApi.get(`/api/lesson/get/${lessonId}`)).data;
+			lesson = (await rcApi.get(`/api/lesson/${lessonId}`)).data;
 			newTitle = lesson.title;
 			newSubject = lesson.subject;
-			lessonText = (await rcApi.get(`/api/lesson/text/${lessonId}`)).data;
+			lessonText = (await rcApi.get(`/api/lesson/content/${lessonId}`)).data;
 		} catch (err) {
 			console.error(err);
 		}
@@ -43,14 +43,14 @@
 			const formData = new FormData();
 			formData.append('file', lessonCover);
 
-			lesson.cover_path = (await rcApi.post('/api/image/upload', formData)).data;
+			lesson.coverPath = (await rcApi.post('/api/image/upload', formData)).data;
 		}
 
 		try {
-			await rcApi.put('/api/lesson/update', {
+			await rcApi.put('/api/lesson', {
 				id: parseInt(lessonId),
 				title: newTitle,
-				cover_path: lesson.cover_path,
+				coverPath: lesson.coverPath,
 				subject: newSubject
 			});
 
@@ -61,7 +61,7 @@
 	};
 
 	const saveText = async () => {
-		await rcApi.post(`api/lesson/upload/${lessonId}`, lessonText);
+		await rcApi.post(`api/lesson/content/${lessonId}`, { content: lessonText });
 
 		await saveChanges();
 
@@ -101,7 +101,7 @@
 			<div class="flex flex-col justify-center my-0 items-center">
 				<h1 class="">{newTitle}</h1>
 				<figure>
-					<img src="{RC_API}/api/image/{lesson.cover_path}" alt="" />
+					<img src="{RC_API}/api/image/{lesson.coverPath}" alt="" />
 				</figure>
 			</div>
 		{/if}

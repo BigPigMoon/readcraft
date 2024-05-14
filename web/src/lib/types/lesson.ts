@@ -1,7 +1,7 @@
 export interface Lesson {
-    id: number;
-    title: string;
-    cover_path?: string;
-    subject?: string;
-    course_id: number;
+	id: number;
+	title: string;
+	coverPath?: string;
+	subject?: string;
+	courseId: number;
 }

@@ -14,12 +14,12 @@
 
 	onMount(async () => {
 		try {
-			lesson = (await rcApi.get(`/api/lesson/get/${lessonId}`)).data;
+			lesson = (await rcApi.get(`/api/lesson/${lessonId}`)).data;
 		} catch (err) {
 			console.error(err);
 		}
 		try {
-			lessonText = (await rcApi.get(`/api/lesson/text/${lessonId}`)).data;
+			lessonText = (await rcApi.get(`/api/lesson/content/${lessonId}`)).data;
 		} catch (err) {
 			lessonText = 'В данный момент тут пусто :(';
 			console.error(err);
@@ -33,7 +33,7 @@
 			<h1 class="text-center">{lesson.title}</h1>
 
 			<div class="flex justify-center my-0">
-				<img class="w-fit" src="{RC_API}/api/image/{lesson.cover_path}" alt="" />
+				<img class="w-fit" src="{RC_API}/api/image/{lesson.coverPath}" alt="" />
 			</div>
 		{/if}
 		{@html snarkdown(lessonText || '')}

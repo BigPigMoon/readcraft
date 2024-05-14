@@ -11,7 +11,7 @@
 	const dispatch = createEventDispatcher();
 
 	const removeLesson = async () => {
-		await rcApi.delete(`/api/lesson/delete/${id}`);
+		await rcApi.delete(`/api/lesson/${id}`);
 
 		dispatch('remove', id);
 	};
