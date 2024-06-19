@@ -6,6 +6,7 @@
 
 	import snarkdown from 'snarkdown';
 	import type { Lesson } from '$lib/types/lesson';
+	import SecretImage from '$lib/components/common/SecretImage.svelte';
 
 	const lessonId = $page.params.slug;
 
@@ -33,7 +34,7 @@
 			<h1 class="text-center">{lesson.title}</h1>
 
 			<div class="flex justify-center my-0">
-				<img class="w-fit" src="{RC_API}/api/image/{lesson.coverPath}" alt="" />
+				<SecretImage imageId={lesson.coverPath} cls="w-fit" />
 			</div>
 		{/if}
 		{@html snarkdown(lessonText || '')}

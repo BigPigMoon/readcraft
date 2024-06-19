@@ -49,6 +49,8 @@ export class LessonService {
     const newLesson = await this.prisma.lesson.create({
       data: {
         title: dto.title,
+        coverPath: dto.coverPath,
+        subject: dto.subject,
         course: { connect: course },
         contentPath: lessonFilename,
       },

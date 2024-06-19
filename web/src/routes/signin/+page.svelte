@@ -9,6 +9,7 @@
 	let password = '';
 
 	let loading = false;
+	let loginError = false;
 
 	const handleLogin = async () => {
 		loading = true;
@@ -23,6 +24,9 @@
 			goto('/');
 		} catch (err) {
 			console.error(err);
+			if (err.response.status === 400) {
+				loginError = true;
+			}
 		} finally {
 			loading = false;
 		}
@@ -42,6 +46,9 @@
 				<form class="w-full px-8 space-y-5" on:submit|preventDefault={handleLogin}>
 					<div class="form-control">
 						<input
+							on:change|preventDefault={(event) => {
+								loginError = false;
+							}}
 							type="email"
 							placeholder="Почта"
 							class="input input-bordered"
@@ -51,6 +58,9 @@
 					</div>
 					<div class="form-control">
 						<input
+							on:change={(event) => {
+								loginError = false;
+							}}
 							type="password"
 							placeholder="Пароль"
 							class="input input-bordered"
@@ -61,6 +71,9 @@
 					<div class="flex flex-col mt-2 justify-start items-start">
 						{#if isEmpty}
 							<span class="label-text-alt text-error">Все поля должны быть заполнены.</span>
+						{/if}
+						{#if loginError}
+							<span class="label-text-alt text-error">Пользователь не найден!</span>
 						{/if}
 					</div>
 					<div class="form-control my-6 flex items-center">

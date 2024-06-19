@@ -4,6 +4,7 @@
 	import type { Folder, TreeNode as TreeNodeType } from '$lib/types/card';
 	import TreeNode from '../card/TreeNode.svelte';
 	import rcApi from '$lib/http/rc';
+	import transApi from '$lib/http/translator';
 
 	export let selected: string;
 	export let src: string;
@@ -21,7 +22,7 @@
 	onMount(async () => {
 		await translate();
 
-		const treeRes = await rcApi.get<TreeNodeType>('/api/group/tree');
+		const treeRes = await rcApi.get<TreeNodeType>('/api/folder/tree');
 		tree = treeRes.data;
 
 		createSelectedFolder = tree.root;
@@ -32,22 +33,13 @@
 	const translate = async () => {
 		loading = true;
 
-		if (selected.trim().split(' ').length === 1) {
-			const res = await rcApi.get<WordData>(
-				`/api/translator/word?query=${selected.trim()}&src=${src}&dst=Ru`
+		if (selected.length !== 0) {
+			const res = await transApi.get<WordData[]>(
+				`/translate?query=${selected.trim()}&src=${src.toLowerCase()}&dst=ru`
 			);
 
-			word = res.data;
-			createCardWord = selected.trim();
-			loading = false;
-		} else {
-			const res = await rcApi.get<WordData[]>(
-				`/api/translator/words?query=${selected.trim()}&src=${src}&dst=Ru`
-			);
-
-			words = res.data.filter((val) => {
-				return val.length !== 0;
-			});
+			words = res.data;
+			console.log(words);
 			loading = false;
 		}
 	};
@@ -136,16 +128,9 @@
 
 		{#if words}
 			<h2 class="card-title">{selected}</h2>
-			{#each words as word}
-				<div class="flex flex-wrap space-x-1">
-					<span class="mr-1 font-bold text-md">{word[0].text}</span> -
-					{#each word[0].translations as translation, index}
-						<snap
-							>{translation.text}{#if index !== word[0].translations.length - 1},{/if}</snap
-						>
-					{/each}
-				</div>
-			{/each}
+			<div class="flex flex-wrap space-x-1">
+				<span class="mr-1 text-md">{words.translation}</span>
+			</div>
 		{/if}
 	</div>
 {/if}

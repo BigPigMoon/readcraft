@@ -1,11 +1,9 @@
 fastapi
 uvicorn
-linguee-api
 transformers
 torch
 sentencepiece
 sacremoses
 langdetect
 gTTS
-httpx
 redis

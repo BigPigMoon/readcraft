@@ -37,10 +37,11 @@
 		formData.append('file', createLessonCover);
 
 		rcApi.post('/api/image/upload', formData).then(async (res) => {
+			console.log(res.data);
 			const createLessonRes = await rcApi.post<Lesson>('/api/lesson', {
 				title: createLessonTitle,
 				subject: createLessonDesc.length === 0 ? null : createLessonDesc,
-				coverPath: res.data, // FIXME: cover doesn't set by user
+				coverPath: res.data,
 				courseId: Number.parseInt(courseId)
 			});
 

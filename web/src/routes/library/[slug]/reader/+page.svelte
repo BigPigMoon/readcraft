@@ -105,11 +105,37 @@
 		let regex = /<body[^>]*>([\s\S]*?)<\/body>/i;
 		let match = originText.match(regex);
 
-		if (match && match[1]) {
-			return match[1];
-		} else {
-			return originText;
+		let res = match && match[1] ? match[1] : originText;
+		res = res.replace(/<svg[^>]*>([\s\S]*?)<\/svg>/gi, '$1');
+		res = setImages(res);
+		res = setCover(res);
+		console.log(res);
+		return res;
+	};
+
+	const setImages = (originText: string): string => {
+		function replaceImgTag(match: any, index: string) {
+			console.log('url', index.replace('/images/', ''));
+			return `<image src="http://localhost:3000/api/book/page/image/${bookId}?url=${index.replace(
+				'/images/',
+				''
+			)}" alt="" />`;
 		}
+
+		return originText.replace(/<img\b[^>]*\bsrc\s*=\s*["']?([^"']+)["']?[^>]*>/gi, replaceImgTag);
+	};
+
+	const setCover = (originText: string): string => {
+		function replaceXlinkHref(match, filename) {
+			console.log(filename);
+			return `<image src="http://localhost:3000/api/book/page/image/${bookId}?url=cover.jpeg" alt="" />`;
+		}
+
+		// Use the replace method with a callback function
+		return originText.replace(
+			/<image\s+width="(\d+)"\s+height="(\d+)"\s+xlink:href="([^"]+)"\s*\/?>/gi,
+			replaceXlinkHref
+		);
 	};
 
 	afterUpdate(() => {
@@ -163,7 +189,7 @@
 	}
 </script>
 
-<div class="h-screen w-screen bg-base-300">
+<div class="h-screen w-screen bg-base-100">
 	<nav class="flex justify-center w-full">
 		<div class="navbar w-5/6 h-20">
 			<div class="navbar-start">

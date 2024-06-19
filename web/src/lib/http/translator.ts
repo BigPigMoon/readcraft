@@ -1,9 +1,9 @@
 import axios from 'axios';
 
-export const TRANSLATOR_API = 'http://locahost:5000';
+export const TRANSLATOR_API = 'http://127.0.0.1:5000';
 
 const transApi = axios.create({
-	withCredentials: true,
+	withCredentials: false,
 	baseURL: TRANSLATOR_API
 });
 

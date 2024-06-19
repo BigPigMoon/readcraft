@@ -58,7 +58,7 @@
 								title: createTitle,
 								language: createLang,
 								filename: bookRes.data,
-								cover_path: imageRes.data,
+								covePath: imageRes.data,
 								author: createAuthor.length > 0 ? createAuthor : null,
 								subject: createSubject.length > 0 ? createSubject : null
 							})
@@ -109,6 +109,21 @@
 		}
 	};
 
+	const sortChange = () => {
+		console.log(books);
+		books
+			.filter(
+				(item) =>
+					item.title.toLowerCase().includes(searchString.toLowerCase()) &&
+					(!filterLang || filterLang === 'all' || item.language === filterLang)
+			)
+			.sort(
+				filterTime === 'new'
+					? (a: Book, b: Book) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()
+					: (b: Book, a: Book) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()
+			);
+	};
+
 	const coverFileChange = (event) => {
 		const file = event.target.files[0];
 
@@ -128,8 +143,8 @@
 		)
 		.sort(
 			filterTime === 'new'
-				? (a: Book, b: Book) => new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime()
-				: (b: Book, a: Book) => new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime()
+				? (a: Book, b: Book) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()
+				: (b: Book, a: Book) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()
 		);
 
 	$: createBookError = Boolean(selectedFile);
@@ -141,7 +156,7 @@
 		<input
 			type="text"
 			placeholder="Поиск..."
-			class="input input-bordered w-full bg-base-300"
+			class="input input-bordered w-full"
 			bind:value={searchString}
 		/>
 	</div>
@@ -162,7 +177,13 @@
 				<div class="mr-4">
 					<PickerIcon />
 				</div>
-				<select class="select select-bordered w-full max-w-xs" bind:value={filterTime}>
+				<select
+					class="select select-bordered w-full max-w-xs"
+					on:change={() => {
+						sortChange();
+					}}
+					bind:value={filterTime}
+				>
 					<option value="new" selected>Недавние</option>
 					<option value="old">Старые</option>
 				</select>
@@ -257,7 +278,9 @@
 	<div class="flex justify-items-center w-full">
 		<div class="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
 			{#each filteredBooks as book}
-				<BookCard {book} />
+				{#key book.covePath}
+					<BookCard {book} />
+				{/key}
 			{/each}
 		</div>
 	</div>

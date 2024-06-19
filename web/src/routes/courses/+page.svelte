@@ -30,11 +30,6 @@
 				a.isOwner === b.isOwner ? 0 : a.isOwner ? -1 : 1
 			);
 			languages = (await rcApi.get<string[]>('/api/language')).data;
-
-			const lastLessonId = getLastLesson();
-			if (lastLessonId) {
-				lastLesson = (await rcApi.get<Lesson>(`/api/lesson/${lastLessonId}`)).data;
-			}
 		} catch (err) {
 		} finally {
 			loading = false;
@@ -78,7 +73,6 @@
 </script>
 
 <div class="flex justify-between">
-	<LastLesson {loading} lesson={lastLesson} {courses} />
 	<div class="w-96 flex flex-col">
 		<div class="pr-12 mb-4 font-bold flex w-full justify-end">Язык курса</div>
 		<select class="select select-bordered w-full max-w-xs" bind:value={filterLang}>

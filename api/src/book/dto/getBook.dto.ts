@@ -6,8 +6,8 @@ export class GetBookDto {
   id: number;
 
   // TODO: не знаю зачем, но вроде как эти поля будут нужны на вебе
-  //   createdAt: Date;
-  //   updatedAt: Date;
+  createdAt: Date;
+  updatedAt: Date;
 
   @ApiProperty({ description: 'Имя книги', example: 'Книга1' })
   title: string;

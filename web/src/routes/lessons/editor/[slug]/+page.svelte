@@ -7,6 +7,7 @@
 	import snarkdown from 'snarkdown';
 	import LoadIcon from '$lib/Icons/LoadIcon.svelte';
 	import type { Lesson } from '$lib/types/lesson';
+	import SecretImage from '$lib/components/common/SecretImage.svelte';
 
 	const lessonId = $page.params.slug;
 
@@ -101,7 +102,7 @@
 			<div class="flex flex-col justify-center my-0 items-center">
 				<h1 class="">{newTitle}</h1>
 				<figure>
-					<img src="{RC_API}/api/image/{lesson.coverPath}" alt="" />
+					<SecretImage cls="" imageId={lesson.coverPath} />
 				</figure>
 			</div>
 		{/if}

@@ -37,8 +37,10 @@
 	},
 	"type": "module",
 	"dependencies": {
+		"@types/lodash": "^4.17.1",
 		"axios": "^1.6.5",
 		"epubjs": "^0.3.93",
+		"lodash": "^4.17.21",
 		"snarkdown": "^2.0.0"
 	}
 }

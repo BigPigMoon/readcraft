@@ -9,6 +9,7 @@
 	import { onMount } from 'svelte';
 	import type { Item, Card, Folder } from '$lib/types/card';
 	import rcApi from '$lib/http/rc';
+	import { goto } from '$app/navigation';
 
 	let items: (Folder | Card)[] = [];
 	let selectedFolderId: number;
@@ -27,7 +28,7 @@
 
 		// FIXME:
 		let storedFolderId = localStorage.getItem('selectedFolder');
-		if (!storedFolderId) {
+		if (storedFolderId == '') {
 			folderId = (await rcApi.get<Folder>('/api/folder/root')).data.id;
 		} else {
 			folderId = parseInt(storedFolderId);
@@ -211,6 +212,14 @@
 		return 'title' in item && 'inviteCode' in item;
 	};
 
+	const startGame = () => {
+		if (items.filter((i) => isCard(i)).length < 4) {
+			alert('В выбранной папке меньше 4 слов, добавьте больше!');
+		} else {
+			goto(`/game/${selectedFolderId}`);
+		}
+	};
+
 	$: newFolderEmpty = newFolderTitle.length === 0;
 	$: disableCreateCard = newCardTranslation.length === 0 || newCardWord.length === 0;
 
@@ -274,14 +283,6 @@
 					</div>
 				</div>
 				<div>
-					<button
-						class="btn btn-outline btn-primary"
-						on:click={() => {
-							// @ts-ignore
-							document.getElementById('my_modal_1')?.showModal();
-						}}
-						>Вставить слова <DownloadIcon />
-					</button>
 					<dialog id="my_modal_1" class="modal">
 						<div class="modal-box flex flex-col space-y-4">
 							<input
@@ -299,9 +300,6 @@
 							<button>close</button>
 						</form>
 					</dialog>
-					<button class="btn btn-secondary" on:click={copyFolderCode}
-						>Скопировать код <CopyIcon /></button
-					>
 				</div>
 			</div>
 
@@ -325,7 +323,12 @@
 					{/if}
 				</div>
 			</div>
-			<a class="w-full btn btn-primary" href="/game/{selectedFolderId}">Учить эту группу</a>
+			<button
+				class="w-full btn btn-primary"
+				on:click={() => {
+					startGame();
+				}}>Учить эту группу</button
+			>
 		</div>
 		<div class="w-1/3 flex flex-col space-y-10">
 			<div class="flex flex-col space-y-7 w-full">
@@ -354,7 +357,7 @@
 			<div class="flex flex-col space-y-7 w-full h-full">
 				<div class="flex flex-col card w-full bg-base-200">
 					<div
-						class="h-full border-dashed m-10 border rounded-xl"
+						class="h-full border-dashed border-base-content m-10 border rounded-xl"
 						on:drop={deleteItemDrop}
 						role="dialog"
 						id="trash-zone"

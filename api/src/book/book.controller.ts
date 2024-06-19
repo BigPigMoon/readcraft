@@ -23,7 +23,7 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import { BookService } from './book.service';
-import { GetCurrentUser } from 'src/common/decorators';
+import { GetCurrentUser, Public } from 'src/common/decorators';
 import { CreateBookDto, UpdateBookDto } from './dto';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { ReadStream } from 'fs';
@@ -99,14 +99,13 @@ export class BookController {
   @Get('/page/image/:id')
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Получает картинку' })
+  @Public()
   async getImageByUrl(
-    @GetCurrentUser('sub') userId: number,
     @Param('id', ParseIntPipe) bookId: number,
     @Query('url') imgUrl: string,
     @Res() res,
   ) {
     const imageBuffer: Buffer = await this.bookService.getImageByUrl(
-      userId,
       bookId,
       imgUrl,
     );
@@ -115,6 +114,14 @@ export class BookController {
     res.setHeader('Content-Length', imageBuffer.length);
 
     res.end(imageBuffer);
+  }
+
+  @Get('/page/image/list/:id')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Получает картинку' })
+  @Public()
+  async getImagesUrls(@Param('id', ParseIntPipe) bookId: number) {
+    return this.bookService.getImageUrlList(bookId);
   }
 
   @Get('/download/:id')

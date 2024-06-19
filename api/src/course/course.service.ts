@@ -47,7 +47,7 @@ export class CourseService {
   async getAll(userId: number, subs: boolean): Promise<GetCourseDto[]> {
     let courseUserIds: number[] = [];
 
-    if (subs === true) {
+    if (subs) {
       courseUserIds = (
         await this.prisma.courseUser.findMany({
           where: {
@@ -60,7 +60,7 @@ export class CourseService {
     }
 
     let courses = [];
-    if (courseUserIds.length === 0) {
+    if (courseUserIds.length === 0 && !subs) {
       courses = await this.prisma.course.findMany({
         where: { active: true },
       });

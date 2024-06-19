@@ -5,6 +5,7 @@
 	import type { Card } from '$lib/types/card';
 	import ReloadIcon from '$lib/Icons/ReloadIcon.svelte';
 	import ExitIcon from '$lib/Icons/ExitIcon.svelte';
+	import AudioText from '$lib/components/common/AudioText.svelte';
 
 	const folderId = $page.params.slug;
 
@@ -30,7 +31,7 @@
 	let isEnd = false;
 
 	onMount(async () => {
-		const getAllCards = await rcApi.get<Card[]>(`/api/card/${folderId}`);
+		const getAllCards = await rcApi.get<Card[]>(`/api/card?group_id=${folderId}`);
 		cards = getAllCards.data;
 		learning = getAllCards.data;
 
@@ -177,8 +178,9 @@
 
 		<div class="card max-w-3xl w-full bg-base-200 flex flex-col p-10">
 			{#if !isEnd}
-				<div class="flex h-52">
+				<div class="flex h-52 flex-row content-center">
 					<h1 class="font-bold text-2xl">{currentWord.word}</h1>
+					<AudioText textForSpeech={currentWord.word} />
 				</div>
 
 				<div class="font-bold mb-5">

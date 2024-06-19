@@ -1,5 +1,6 @@
 from transformers import MarianMTModel, MarianTokenizer
-from fastapi import FastAPI, Query, HTTPException
+from starlette.middleware.cors import CORSMiddleware
+from fastapi import FastAPI, Query
 from fastapi.responses import FileResponse
 from enum import Enum
 from itertools import combinations
@@ -8,15 +9,22 @@ from gtts import gTTS
 import redis
 import uuid
 import os
-import httpx
 import json
 
 
 app = FastAPI()
 r = redis.Redis(host='cache', port=6379, decode_responses=True)
-TRANSLATION_SERVICE_URL = "localhost:5001"
 
-# TODO: было бы классно, это забирать с основного API
+origins = ["*"]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_credentials=True,
+    allow_origins=["*"],  # Укажите ваш домен, с которого приходят запросы
+    allow_methods=["*"],  # Укажите разрешенные HTTP методы
+    allow_headers=["*"],  # Разрешите любые заголовки
+)
+
 class Language(str, Enum):
     en = "en"
     ru = "ru"
@@ -46,8 +54,9 @@ def preload_models():
 
     return res
 
-
+print('preload models........................')
 loaded_models = preload_models()
+print('models preloaded')
 
 
 def transltae_text(query, tokenizer, model):
@@ -81,13 +90,18 @@ def translate(query: str, src: str, dst: str):
 async def translate_query(query: str = Query(..., title="Query string to translate"),
                          src: Language = Query(..., title="Source language"),
                          dst: Language = Query(..., title="Destination language")):
+    redis_key = f"{query}:{src}:{dst}"
     translation = translate(query, src.value, dst.value)
+    save_to_redis(redis_key, translation)
     return {"translation": translation}
 
 
 @app.get("/detect")
 async def detect_lang(query: str = Query(..., title="Query string to detect")):
-    return detect(query)
+    lang = detect(query)
+    if lang in ["bg", "mk", "uk"]:
+        lang = "ru"
+    return lang
 
 
 audio_folder = "audio"
@@ -118,40 +132,7 @@ def get_from_redis(query: str):
         return json.loads(res)
     return None
 
-# Изменение функции fetch_translations для сохранения результата в Redis
-async def fetch_translations(query: str, src: Language, dst: Language) -> str:
-    # Сначала проверяем, есть ли результат в Redis
-    cached_result = get_from_redis(query)
-    if cached_result:
-        return cached_result
-
-    # Если результат не найден в Redis, делаем запрос к сервису перевода
-    async with httpx.AsyncClient() as client:
-        response = await client.get(
-            f"http://{TRANSLATION_SERVICE_URL}/api/v2/translations",
-            params={"query": query, "src": src.value, "dst": dst.value}
-        )
-        response.raise_for_status()
-        translation_result = response.text
-        
-        # Сохраняем результат в Redis перед возвратом
-        save_to_redis(query, translation_result)
-        
-        return json.loads(translation_result)
-
-
-@app.get("/word")
-async def translate_word(
-    query: str = Query(..., title="Query string to translate"),
-    src: Language = Query(..., title="Source language"),
-    dst: Language = Query(..., title="Destination language")
-):
-    try:
-        return await fetch_translations(query, src, dst)
-    except httpx.HTTPStatusError as e:
-        raise HTTPException(status_code=e.response.status_code, detail=str(e))
-    except httpx.RequestError as e:
-        raise HTTPException(status_code=500, detail="Translation service error")
+print('server started')
 
 
 if __name__ == "__main__":

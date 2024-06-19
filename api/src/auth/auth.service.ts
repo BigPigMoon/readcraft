@@ -11,6 +11,8 @@ import { Tokens } from './types';
 import * as bcrypt from 'bcrypt';
 import { Prisma } from '@prisma/client';
 import { FolderService } from 'src/folder/folder.service';
+import { BookService } from 'src/book/book.service';
+import { CourseService } from 'src/course/course.service';
 
 @Injectable()
 export class AuthService {
@@ -20,6 +22,8 @@ export class AuthService {
     private prisma: PrismaService,
     private jwtService: JwtService,
     private folderService: FolderService,
+    private bookService: BookService,
+    private courseService: CourseService,
   ) {}
 
   async signUpLocal(dto: SingUpDto): Promise<Tokens> {
@@ -49,6 +53,21 @@ export class AuthService {
     });
 
     this.folderService.create(newUser.id, { title: newUser.nickname });
+    this.bookService.create(newUser.id, {
+      title: "Gulliver's Travels",
+      language: 'EN',
+      filename: 'book1.epub',
+      author: 'Jonathan Swift',
+      covePath: 'book1.jpg',
+    });
+    this.bookService.create(newUser.id, {
+      title: 'The Adventures of Tom Sawyer',
+      language: 'EN',
+      filename: 'book2.epub',
+      author: 'Mark Twain',
+      covePath: 'book2.jpg',
+    });
+    this.courseService.sub(newUser.id, 'f533da47-f9c0-4ae9-8be3-b15404a42b4d');
 
     const tokens = await this.getTokens(newUser.id, newUser.email);
     await this.updateRtHash(newUser.id, tokens.refreshToken);

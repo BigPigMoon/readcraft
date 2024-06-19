@@ -73,7 +73,7 @@
 			</div>
 		{:else}
 			<div>
-				<button class="btn btn-secondary" on:click={unsubscribe}><MinusIcon />Отписаться</button>
+				<button class="btn btn-error" on:click={unsubscribe}><MinusIcon />Отписаться</button>
 			</div>
 		{/if}
 	</div>

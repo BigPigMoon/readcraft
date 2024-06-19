@@ -1,11 +1,11 @@
 export interface Book {
 	id: number;
-	created_at: string;
-	updated_at: string;
+	createdAt: string;
+	updatedAt: string;
 	title: string;
 	language: string;
 	filename: string;
-	coverPath: null | string;
+	covePath: null | string;
 	author: string | null;
 	subject: null | null;
 	progress: number;

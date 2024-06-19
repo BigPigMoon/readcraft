@@ -9,6 +9,7 @@
 	import { languageNames } from '$lib/languages';
 	import type { Book } from '$lib/types/book';
 	import { onMount } from 'svelte';
+	import SecretImage from '$lib/components/common/SecretImage.svelte';
 
 	const bookId = $page.params.slug;
 	let book: Book;
@@ -57,7 +58,7 @@
 			<Loading />
 		{:else if book}
 			<figure>
-				<img class="h-full max-w-5xl" src="{RC_API}/api/image/download/{book.cover_path}" alt="witcher" />
+				<SecretImage cls="h-full max-w-5xl" imageId={book.covePath} />
 			</figure>
 			<div class="card-body w-fit">
 				<div class="h-full space-y-4 flex-col">

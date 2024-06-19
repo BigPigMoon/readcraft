@@ -1,19 +1,15 @@
 <script lang="ts">
 	import { RC_API } from '$lib/http';
 	import type { Book } from '$lib/types/book';
+	import SecretImage from '../common/SecretImage.svelte';
 
 	export let book: Book;
 </script>
 
 <a class="group hover:cursor-pointer bg-base-300 card w-72 m-4" href={`/library/${book.id}`}>
-	<figure class="rounded-xl m-3 mb-0">
-		<img
-			src="{RC_API}/api/image/download/{book.cover_path}"
-			width="400"
-			height="600"
-			alt="witcher"
-		/>
-	</figure>
+	<div class="rounded-xl m-3 mb-0">
+		<SecretImage cls="" imageId={book.covePath} />
+	</div>
 	<div class="card-body mt-0">
 		<h2 class="card-title group-hover:text-primary text-base-content">{book.title}</h2>
 		{#if book.author}

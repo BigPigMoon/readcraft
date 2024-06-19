@@ -28,16 +28,16 @@
 <div class="card card-side h-fit bg-neutral">
 	<div class="card-body flex-row items-center justify-between space-x-10">
 		<div class="flex-grow flex-row flex items-center space-x-4">
-			<div class="flex justify-center items-center flex-col">
+			<div class="flex justify-center items-center flex-col text-neutral-content">
 				<!-- <button class="btn btn-circle btn-ghost btn-sm" on:click={upLessonOrder}>
 					<MiniUpArrow />
 				</button> -->
-				<p class="font-bold text-lg">{index}</p>
+				<p class="font-bold text-lg text-neutral-content">{index}</p>
 				<!-- <button class="btn btn-circle btn-ghost btn-sm" on:click={downLessonOrder}>
 					<MiniDownArrow />
 				</button> -->
 			</div>
-			<span class="font-bold text-lg">{title}</span>
+			<span class="font-bold text-lg text-neutral-content">{title}</span>
 		</div>
 		<div class="flex flex-row space-x-4 items-center">
 			<button class="btn btn-primary btn-outline" on:click={removeLesson}
