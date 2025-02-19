@@ -49,6 +49,8 @@ export class LessonService {
     const newLesson = await this.prisma.lesson.create({
       data: {
         title: dto.title,
+        coverPath: dto.coverPath,
+        subject: dto.subject,
         course: { connect: course },
         contentPath: lessonFilename,
       },
@@ -69,6 +71,7 @@ export class LessonService {
 
     const lessons = await this.prisma.lesson.findMany({
       where: { courseId: courseId, active: true },
+      orderBy: { createdAt: 'asc' },
     });
 
     return lessons.map((el) => this.getLessonDto(el));

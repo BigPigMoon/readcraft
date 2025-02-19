@@ -140,20 +140,18 @@ export class BookService {
     };
   }
 
-  async getImageByUrl(userId, bookId, url): Promise<Buffer> {
-    const bookUser = await this.prisma.bookUser.findFirst({
-      where: { userId, bookId },
-    });
-
-    if (!bookUser) {
-      throw new NotFoundException('book not found');
-    }
-
+  async getImageByUrl(bookId, url): Promise<Buffer> {
     const book = await this.prisma.book.findUnique({
       where: { id: bookId },
     });
 
+    if (!book) {
+      throw new NotFoundException('');
+    }
+
     const epub = await this.getEpubFile(book.filename);
+
+    console.log(epub.listImage());
 
     const images = epub.listImage().filter((img) => img.href === url);
 
@@ -164,6 +162,20 @@ export class BookService {
     const imageData = await epub.getImageAsync(images[0].id);
 
     return imageData[0];
+  }
+
+  async getImageUrlList(bookId: number): Promise<string[]> {
+    const book = await this.prisma.book.findUnique({
+      where: { id: bookId },
+    });
+
+    if (!book) {
+      throw new NotFoundException('');
+    }
+
+    const epub = await this.getEpubFile(book.filename);
+
+    return epub.listImage().map((url) => url.href);
   }
 
   async changePage(
@@ -240,6 +252,8 @@ export class BookService {
     return {
       id: book.id,
       title: book.title,
+      updatedAt: book.updatedAt,
+      createdAt: book.createdAt,
       language: book.language,
       progress: book.progress,
       author: book.author,

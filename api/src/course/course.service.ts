@@ -17,10 +17,13 @@ export class CourseService {
   constructor(private readonly prisma: PrismaService) {}
 
   async create(userId: number, dto: CreateCourseDto): Promise<GetCourseDto> {
+    const inviteLink = uuidv4();
+
     const newCourse = await this.prisma.course.create({
       data: {
         language: dto.language,
         title: dto.title,
+        inviteLink,
       },
     });
 
@@ -44,7 +47,7 @@ export class CourseService {
   async getAll(userId: number, subs: boolean): Promise<GetCourseDto[]> {
     let courseUserIds: number[] = [];
 
-    if (subs === true) {
+    if (subs) {
       courseUserIds = (
         await this.prisma.courseUser.findMany({
           where: {
@@ -57,7 +60,7 @@ export class CourseService {
     }
 
     let courses = [];
-    if (courseUserIds.length === 0) {
+    if (courseUserIds.length === 0 && !subs) {
       courses = await this.prisma.course.findMany({
         where: { active: true },
       });
@@ -195,14 +198,7 @@ export class CourseService {
       throw new NotFoundException('course not found');
     }
 
-    const inviteLink = uuidv4();
-
-    await this.prisma.course.update({
-      where: { id: courseId },
-      data: { inviteLink: inviteLink },
-    });
-
-    return inviteLink;
+    return course.inviteLink;
   }
 
   async getCourseDto(userId: number, course: Course): Promise<GetCourseDto> {

@@ -45,7 +45,7 @@ services:
       - "5001:5001"
     networks:
       - net
-  
+
   api:
     image: rc_api
     build:
@@ -56,12 +56,16 @@ services:
       - net
     env_file:
       - ./api/.env
+    volumes:
+      - api_data:/uploads
 
 volumes:
   redis_data:
   db:
     driver: local
   db_test:
+    driver: local
+  api_data:
     driver: local
 
 networks:
